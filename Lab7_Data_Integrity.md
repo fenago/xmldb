@@ -2,7 +2,7 @@
 
 ## Objective
 
-In this lab, you will enforce data integrity on XML data stored in Oracle Database. This encompasses ensuring the XML documents are well-formed, adhere to the XML schema, and follow rules like uniqueness and foreign-key relations using SQL constraints.
+In this lab, we will learn how to use SQL constraints and database triggers to enforce data integrity on XML data stored in Oracle Database. This includes ensuring that the XML documents are well-formed, conform to the XML schema, and enforce rules such as uniqueness and foreign-key relations using SQL constraints.
 
 ## Prerequisites
 
@@ -22,7 +22,49 @@ In this lab, you will enforce data integrity on XML data stored in Oracle Databa
         chown oracle /headless/Desktop/XMLData
         ```
 
-3. **Prepare the XML File:** 
+3. **Open SQLPlus or SQL Developer:** 
+    - If you're using SQLPlus, connect directly from the terminal with the following command:
+        ```bash
+        sqlplus / as sysdba
+        ```
+    - If using SQL Developer, either create a new connection or use an existing one with the username `hr` and password `hr`.
+
+4. **Check if the `hr` User Exists:** 
+    - Verify if the `hr` user actually exists in your Oracle instance:
+        ```sql
+        SELECT username FROM DBA_USERS WHERE UPPER(username) = 'HR';
+        ```
+
+    - If this returns no results, then the `hr` user does not exist in your database.
+
+5. **Create the HR User (if it doesn’t exist):** 
+
+    ```sql
+    CREATE USER hr IDENTIFIED BY hr DEFAULT TABLESPACE users TEMPORARY TABLESPACE temp;
+    GRANT CONNECT, RESOURCE TO hr;
+    ```
+
+    This will create the `hr` user with the password `hr`.
+
+6. **If the HR User Was Locked:** 
+    - If `hr` existed but was locked, you can unlock it:
+        ```sql
+        ALTER USER hr ACCOUNT UNLOCK;
+        ```
+
+7. **Create an Oracle Directory Object:** 
+    - Create a pointer to the XML file's physical location on the server:
+        ```sql
+        CREATE OR REPLACE DIRECTORY XMLDATA_DIR AS '/headless/Desktop/XMLData';
+        ```
+
+8. **Grant Directory Permissions to HR:**
+
+    ```sql
+    GRANT READ, WRITE ON DIRECTORY XMLDATA_DIR TO hr;
+    ```
+
+9. **Prepare the XML File:** 
     - Within the newly created `XMLData` directory, create an XML file named `Invoice.xml`. The XML might look like:
         ```xml
         <PurchaseOrder>
@@ -37,20 +79,7 @@ In this lab, you will enforce data integrity on XML data stored in Oracle Databa
         </PurchaseOrder>
         ```
 
-4. **Connect to the Oracle Database:** 
-    - Open SQLPlus or SQL Developer. If using SQLPlus, connect with the following:
-        ```bash
-        sqlplus hr/hr
-        ```
-
-5. **Create an Oracle Directory Object:** 
-    - Now, create a pointer to the XML file's physical location on the server:
-        ```sql
-        CREATE OR REPLACE DIRECTORY XMLDATA_DIR AS '/headless/Desktop/XMLData';
-        GRANT READ, WRITE ON DIRECTORY XMLDATA_DIR TO hr;
-        ```
-
-6. **Create an XMLType table with a virtual column and a unique constraint:** 
+10. **Create an XMLType table with a virtual column and a unique constraint:** 
     - Execute:
         ```sql
         CREATE TABLE po_binaryxml OF XMLType
@@ -62,7 +91,7 @@ In this lab, you will enforce data integrity on XML data stored in Oracle Databa
                                     AS VARCHAR2(32))));
         ```
 
-7. **Insert XML data into the table:** 
+11. **Insert XML data into the table:** 
     - Use the following command:
         ```sql
         INSERT INTO po_binaryxml
@@ -70,13 +99,13 @@ In this lab, you will enforce data integrity on XML data stored in Oracle Databa
                         nls_charset_id('AL32UTF8')));
         ```
 
-8. **Validate the data insertion:** 
+12. **Validate the data insertion:** 
     - Run:
         ```sql
         SELECT * FROM po_binaryxml;
         ```
 
-9. **Disconnect from the Oracle Database:** 
+13. **Disconnect from the Oracle Database:** 
     - If using SQLPlus, type `exit`. In SQL Developer, right-click the connection and select `Disconnect`.
 
 ## Challenge Exercise
