@@ -20,7 +20,7 @@ In this lab, we will learn how to use SQL constraints and database triggers to e
     sqlplus / as sysdba
     ```
    
-    If you're using SQL Developer, create a new connection or use an existing one (SYS) to connect to the database.
+    If you're using SQL Developer, create a new connection or use an existing one (SYS) to connect to the database.  Make sure to connect to hr with the password hr.
 
 3. **Create an XMLType table with a virtual column and a unique constraint:** The following SQL command creates an XMLType table named `po_binaryxml` with a virtual column `c_xtabref`, and a unique constraint `reference_is_unique` on that column. This ensures that the value of node `/PurchaseOrder/Reference/text()` is unique across all documents stored in the table:
 
